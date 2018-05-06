@@ -452,7 +452,7 @@ func SetDutyCycle(pin Pin, dutyLen, cycleLen uint32) {
 	const msen = 1 << 7 // use M/S transition instead of pwm algorithm
 
 	// reset settings
-	pwmMem[pwmCtlReg] = pwmMem[pwmCtlReg]&^(ctlMask<<shift) | msen<<shift | pwen <<shift
+	pwmMem[pwmCtlReg] = pwmMem[pwmCtlReg]&^(ctlMask<<shift) | msen<<shift | pwen<<shift
 	// set duty cycle
 	pwmMem[pwmDatReg] = dutyLen
 	pwmMem[pwmRngReg] = cycleLen
@@ -482,7 +482,7 @@ func Open() (err error) {
 
 	// Open fd for rw mem access; try dev/mem first (need root)
 	file, err = os.OpenFile("/dev/mem", os.O_RDWR|os.O_SYNC, 0)
-	if os.IsPermission(err) { // try gpiomem otherwise (some extra functions like clock and pwm setting wont work)
+	if os.IsPermission(err) || os.IsNotExist(err) { // try gpiomem otherwise (some extra functions like clock and pwm setting wont work)
 		file, err = os.OpenFile("/dev/gpiomem", os.O_RDWR|os.O_SYNC, 0)
 	}
 	if err != nil {
